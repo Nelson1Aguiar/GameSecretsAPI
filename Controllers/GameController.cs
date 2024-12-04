@@ -122,7 +122,7 @@ namespace GameSecretsAPI.Controllers
                     retryCount++;
                 }
 
-                return Ok(new { status = "success", message = $"{gamePlayingNow} acertou {game.RightNumbersTurn} dígitos", Turn = game.CurrentPlayerTurn });
+                return Ok(new { status = "success", message = $"{gamePlayingNow} acertou {game.RightNumbersTurn} digitos", Turn = game.CurrentPlayerTurn });
             }
             catch (ApplicationException ex)
             {
