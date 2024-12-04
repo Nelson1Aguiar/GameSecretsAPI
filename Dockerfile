@@ -1,31 +1,28 @@
-# Acesse https://aka.ms/customizecontainer para saber como personalizar seu contêiner de depuração e como o Visual Studio usa este Dockerfile para criar suas imagens para uma depuração mais rápida.
-
-# Dependendo do sistema operacional dos computadores host que compilarão ou executarão os contêineres, a imagem especificada na instrução FROM pode precisar ser alterada.
-# Para obter mais informações, consulte https://aka.ms/containercompat.
-
-# Esta fase é usada durante a execução no VS no modo rápido (Padrão para a configuração de Depuração)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+# Base para execução
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
-# Esta fase é usada para compilar o projeto de serviço
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
+# Build e restauração
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copie o arquivo de projeto e restaure dependências
 COPY ["GameSecretsAPI.csproj", "."]
 RUN dotnet restore "./GameSecretsAPI.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./GameSecretsAPI.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
-# Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
+# Copie o restante do código e compile
+COPY . .
+RUN dotnet build "./GameSecretsAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Publicação
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./GameSecretsAPI.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./GameSecretsAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
+# Final para execução
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
