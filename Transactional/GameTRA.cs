@@ -68,7 +68,7 @@ namespace GameSecretsAPI.Transactional
             return null;
         }
 
-        private void ResetInstanceGame()
+        public void ResetInstanceGame()
         {
             game.CurrentPlayerTurn = string.Empty;
             game.Player1 = string.Empty;

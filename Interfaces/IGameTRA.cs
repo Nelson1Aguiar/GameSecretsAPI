@@ -7,6 +7,6 @@ namespace GameSecretsAPI.Interfaces
         public void GameStart(string playerName, string password);
         public Game? GetGame();
         public void GameTurn(string playerName, string password);
-        void ResetInstanceGame();
+        public void ResetInstanceGame();
     }
 }
