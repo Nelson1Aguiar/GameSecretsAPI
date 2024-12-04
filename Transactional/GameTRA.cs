@@ -67,5 +67,15 @@ namespace GameSecretsAPI.Transactional
 
             return null;
         }
+
+        private void ResetInstanceGame()
+        {
+            game.CurrentPlayerTurn = string.Empty;
+            game.Player1 = string.Empty;
+            game.Player2 = string.Empty;
+            game.PasswordPlayer1 = string.Empty;
+            game.PasswordPlayer2 = string.Empty;
+            game.RightNumbersTurn = 0;
+        }
     }
 }

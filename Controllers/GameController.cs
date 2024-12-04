@@ -76,6 +76,7 @@ namespace GameSecretsAPI.Controllers
                     }
                     else
                     {
+                        _gameTRA.ResetInstanceGame();
                         return Ok(new { status = "success", message = gameStartPlayer.Player + " É o vencedor", numerosCertos = game.RightNumbersTurn });
                     }
                 }
