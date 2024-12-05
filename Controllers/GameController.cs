@@ -68,7 +68,8 @@ namespace GameSecretsAPI.Controllers
                 {
                     _gameTRA.GameTurn(gameStartPlayer.Player, gameStartPlayer.Password);
 
-                    Game game = _gameTRA.GetGame();
+                    Game game = new Game();
+                    game = _gameTRA.GetGame();
 
                     if (game.RightNumbersTurn < 4)
                     {
@@ -76,7 +77,6 @@ namespace GameSecretsAPI.Controllers
                     }
                     else
                     {
-                        _gameTRA.ResetInstanceGame();
                         return Ok(new { status = "success", message = gameStartPlayer.Player + " É o vencedor", numerosCertos = 4 });
                     }
                 }
@@ -98,22 +98,29 @@ namespace GameSecretsAPI.Controllers
         {
             try
             {
-                Game game = _gameTRA.GetGame();
+                Game game = new Game();
+                game = _gameTRA.GetGame();
 
                 int maxRetries = 5000;
                 int retryCount = 0;
+                int rightNumbers = 0;
 
                 string gamePlayingNow = string.Empty;
 
                 while (retryCount < maxRetries)
                 {
                     game = _gameTRA.GetGame();
-                    if (string.Equals(game.CurrentPlayerTurn, player))
+                    if (string.Equals(game.CurrentPlayerTurn, player) || game.RightNumbersTurn == 4)
                     {
+                        rightNumbers = game.RightNumbersTurn;
+
                         if (string.Equals(game.Player1, player))
                             gamePlayingNow = game.Player2;
                         else
                             gamePlayingNow = game.Player1;
+
+                        if(game.RightNumbersTurn == 4 && string.Equals(game.CurrentPlayerTurn, player))
+                            _gameTRA.ResetInstanceGame();
 
                         break;
                     }
@@ -122,7 +129,7 @@ namespace GameSecretsAPI.Controllers
                     retryCount++;
                 }
 
-                return Ok(new { status = "success", message = $"{gamePlayingNow} acertou {game.RightNumbersTurn} digitos", Turn = game.CurrentPlayerTurn });
+                return Ok(new { status = "success", rightNumbers = rightNumbers, lastTurnPlayer = gamePlayingNow, Turn = game.CurrentPlayerTurn });
             }
             catch (ApplicationException ex)
             {
