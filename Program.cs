@@ -37,7 +37,22 @@ namespace GameSecretsAPI
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("AllowAllOrigins");  // Configuração do CORS antes de outros middlewares
+            app.UseWebSockets();
+
+            app.Map("/chat", async context =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                    await ChatWebSocketHandler.HandleAsync(webSocket);
+                }
+                else
+                {
+                    context.Response.StatusCode = 400;
+                }
+            });
+
+            app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection();
             app.UseAuthorization();
 
