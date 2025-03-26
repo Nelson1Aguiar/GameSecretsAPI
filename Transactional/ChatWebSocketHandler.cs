@@ -21,7 +21,7 @@ namespace GameSecretsAPI.Transactional
                 var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 Console.WriteLine($"Mensagem do chat: {message}");
 
-                await BroadcastAsync($"[Chat] {message}");
+                await BroadcastAsync(message);
 
                 result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
